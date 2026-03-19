@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — ZUNITRA</title>
+<link rel="stylesheet" href="global.css">
+<style>
+.product-page { padding-top: var(--nav-h); }
+
+.prod-breadcrumb {
+  padding: 16px 48px;
+  background: var(--dark);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 10px; letter-spacing: 2px; color: var(--gray);
+  display: flex; gap: 12px; align-items: center;
+}
+.prod-breadcrumb a { color: var(--gray); transition: color 0.3s; }
+.prod-breadcrumb a:hover { color: var(--gold); }
+.prod-breadcrumb span { color: rgba(201,168,76,0.5); }
+
+.prod-layout {
+  display: grid; grid-template-columns: 1fr 1fr;
+  min-height: calc(100vh - var(--nav-h) - 48px);
+  background: var(--dark);
+}
+
+/* LEFT — Visual */
+.prod-visual {
+  position: sticky; top: var(--nav-h);
+  height: calc(100vh - var(--nav-h));
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 32px;
+  background: radial-gradient(circle at 50% 42%, #181818, #090909);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+}
+.prod-visual-bg {
+  position: absolute; inset: 0;
+  opacity: 0.04;
+  background-image:
+    linear-gradient(rgba(201,168,76,1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,1) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.prod-watch-wrap {
+  position: relative; z-index: 2;
+  animation: floatSlow 7s ease-in-out infinite;
+  filter: drop-shadow(0 24px 60px rgba(0,0,0,0.8));
+}
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-16px) rotate(3deg); }
+}
+.prod-thumb-row {
+  display: flex; gap: 12px; position: relative; z-index: 2;
+}
+.prod-thumb {
+  width: 56px; height: 56px;
+  background: var(--dark3);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center;
+  cursor: none; transition: border-color 0.3s;
+}
+.prod-thumb.active, .prod-thumb:hover { border-color: var(--gold); }
+.prod-thumb svg { width: 40px; height: auto; }
+
+/* RIGHT — Info */
+.prod-info-panel {
+  padding: 48px;
+  overflow-y: auto;
+}
+.prod-top { margin-bottom: 32px; }
+.prod-brand-tag { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+.prod-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 3.5vw, 52px);
+  font-weight: 300; line-height: 1.05;
+  margin-bottom: 8px;
+}
+.prod-ref { font-size: 11px; letter-spacing: 2px; color: var(--gray); margin-bottom: 16px; }
+
+.prod-rating {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 8px;
+}
+.prod-stars { color: var(--gold); font-size: 14px; letter-spacing: 2px; }
+.prod-rating-count { font-size: 11px; color: var(--gray); }
+
+.prod-stock { font-size: 11px; letter-spacing: 1px; }
+.prod-stock.in-stock { color: var(--green); }
+.prod-stock.low-stock { color: #E8A050; }
+.prod-stock.out { color: var(--red); }
+
+.prod-price-block { margin: 24px 0 32px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); }
+.prod-original { font-size: 14px; color: var(--gray); text-decoration: line-through; font-family: var(--font-body); margin-bottom: 4px; }
+.prod-price {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4vw, 54px);
+  color: var(--gold); font-weight: 300; line-height: 1;
+}
+.prod-price-note { font-size: 10px; letter-spacing: 2px; color: var(--gray); margin-top: 8px; }
+
+.prod-desc { font-size: 13px; line-height: 1.9; color: var(--gray-light); margin-bottom: 32px; }
+
+/* Actions */
+.prod-actions { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+.prod-add-btn { position: relative; overflow: hidden; }
+.prod-add-btn::after {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s;
+}
+.prod-add-btn:hover::after { left: 100%; }
+.prod-secondary { display: flex; gap: 12px; }
+
+/* Specs */
+.prod-specs { margin-top: 40px; }
+.specs-title {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 20px;
+}
+.specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.spec-row {
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.spec-key { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+.spec-val { font-size: 13px; color: var(--white); }
+
+/* Long description */
+.prod-long-desc {
+  margin-top: 40px; padding-top: 40px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.prod-long-desc h3 {
+  font-family: var(--font-display); font-size: 28px; font-weight: 300;
+  margin-bottom: 16px;
+}
+.prod-long-desc p { font-size: 13px; line-height: 1.9; color: var(--gray); }
+
+/* Related */
+.related-section { padding: 80px 48px; background: var(--dark); }
+.related-section h2 { font-family: var(--font-display); font-size: 36px; font-weight: 300; margin: 12px 0 40px; }
+.related-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+
+/* Loading state */
+.prod-loading {
+  grid-column: 1/-1; padding: 120px 48px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .prod-layout { grid-template-columns: 1fr; }
+  .prod-visual { position: static; height: auto; padding: 60px 24px 40px; }
+  .prod-info-panel { padding: 32px 24px; }
+  .prod-breadcrumb { padding: 16px 24px; }
+  .related-section { padding: 60px 24px; }
+  .related-grid { grid-template-columns: 1fr 1fr; }
+  .specs-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .related-grid { grid-template-columns: 1fr; }
+}
+
+.inr-price { font-size: 13px; color: var(--gray-light); letter-spacing: 1px; display: block; margin-top: 4px; font-family: var(--font-body); }
+.prod-price .inr-price { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-logo">ZUNITRA</div>
+  <div class="loader-bar"></div>
+</div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">ZUNI<span>TRA</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Collection</a></li>
+    <li><a href="../index.html#heritage">Heritage</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="nav-account-btn" onclick="window.location.href='account.html'">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="nav-icon-btn" onclick="window.location.href='cart.html'" style="position:relative">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="nav-badge" id="cart-badge" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<div class="product-page" id="product-page">
+  <div class="prod-breadcrumb">
+    <a href="index.html">Home</a>
+    <span>›</span>
+    <a href="shop.html">Collection</a>
+    <span>›</span>
+    <span id="breadcrumb-name" style="color:var(--white)">Loading…</span>
+  </div>
+
+  <div class="prod-layout" id="prod-layout">
+    <div class="prod-loading"><div class="skeleton" style="width:200px;height:240px;border-radius:4px"></div></div>
+  </div>
+</div>
+
+<!-- Related -->
+<section class="related-section" id="related-section" style="display:none">
+  <div class="eyebrow">You May Also Appreciate</div>
+  <h2>Related Timepieces</h2>
+  <div class="related-grid" id="related-grid"></div>
+</section>
+
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">ZUNITRA</div>
+      <p class="footer-tagline">Since 1847, crafting timepieces of singular distinction.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Navigate</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html">Collection</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zunitra Home</span>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { initShared, fetchProducts, fetchProduct, watchSVG, watchDisplay, Cart, showToast, fmtPrice, fmtPriceRaw, starsHTML } from "./utils.js";
+initShared();
+
+const id = new URLSearchParams(window.location.search).get("id");
+
+async function loadProduct() {
+  if (!id) { window.location.href = "shop.html"; return; }
+
+  const p = await fetchProduct(id);
+  if (!p) { window.location.href = "shop.html"; return; }
+
+  document.title = `${p.name} — ZUNITRA`;
+  document.getElementById("breadcrumb-name").textContent = p.name;
+
+  const stockText = p.stock > 5 ? "In Stock" : p.stock > 0 ? `Only ${p.stock} remaining` : "Sold Out";
+  const stockClass = p.stock > 5 ? "in-stock" : p.stock > 0 ? "low-stock" : "out";
+  const specsHTML = Object.entries(p.specs || {}).map(([k, v]) => `
+    <div class="spec-row">
+      <span class="spec-key">${k}</span>
+      <span class="spec-val">${v}</span>
+    </div>`).join("");
+
+  document.getElementById("prod-layout").innerHTML = `
+    <!-- Visual Panel -->
+    <div class="prod-visual">
+      <div class="prod-visual-bg"></div>
+      <div class="prod-watch-wrap" id="main-watch-display">
+        ${watchDisplay(p, 300)}
+      </div>
+      <div class="prod-thumb-row">
+        <div class="prod-thumb active" title="Front">
+          ${watchSVG(p, 40)}
+        </div>
+        <div class="prod-thumb" title="Side" style="opacity:0.5;cursor:not-allowed" title="Additional views coming soon">
+          ${watchSVG({ ...p, color: p.color, accentColor: "#666" }, 40)}
+        </div>
+        <div class="prod-thumb" style="opacity:0.5;cursor:not-allowed">
+          ${watchSVG({ ...p, color: "#0A0A0A", accentColor: p.accentColor }, 40)}
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="prod-info-panel">
+      <div class="prod-top">
+        <div class="prod-brand-tag">${p.brand}</div>
+        ${p.badge ? `<span class="badge badge-${p.badge}" style="margin-bottom:12px;display:inline-block">${p.badge === "limited" ? "Limited Edition" : p.badge === "new" ? "New Arrival" : "On Sale"}</span>` : ""}
+        <h1 class="prod-title">${p.name}</h1>
+        <div class="prod-ref">Reference ${p.ref}</div>
+        <div class="prod-rating">
+          <span class="prod-stars">${starsHTML(p.rating || 5)}</span>
+          <span class="prod-rating-count">${p.reviews || 0} reviews</span>
+        </div>
+        <div class="prod-stock ${stockClass}">${stockText}</div>
+      </div>
+
+      <div class="prod-price-block">
+        ${p.originalPrice ? `<div class="prod-original">${fmtPrice(p.originalPrice)}</div>` : ""}
+        <div class="prod-price">${fmtPrice(p.price)}</div>
+        <div class="prod-price-note">Free insured shipping · 30-day returns</div>
+      </div>
+
+      <p class="prod-desc">${p.desc}</p>
+
+      <div class="prod-actions">
+        <button class="btn btn-gold btn-lg btn-full prod-add-btn" onclick="addToCart()" ${p.stock === 0 ? "disabled style='opacity:0.4'" : ""}>
+          ${p.stock === 0 ? "Sold Out" : "Add to Selection"}
+        </button>
+        <div class="prod-secondary">
+          <button class="btn btn-outline btn-full" onclick="window.location.href='cart.html'">View Cart</button>
+          <button class="btn btn-ghost" onclick="showToast('Saved to wishlist','success')" style="flex-shrink:0">♡ Save</button>
+        </div>
+      </div>
+
+      <div class="prod-specs">
+        <div class="specs-title">Specifications</div>
+        <div class="specs-grid">${specsHTML}</div>
+      </div>
+
+      <div class="prod-long-desc">
+        <h3>The Story</h3>
+        <p>${p.longDesc || p.desc}</p>
+      </div>
+
+      <div style="margin-top:40px;padding:20px;background:rgba(201,168,76,0.04);border:1px solid rgba(201,168,76,0.15)">
+        <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px">Secure Checkout</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap">
+          ${["🔒 SSL Encrypted","📦 Free Insured Shipping","↩ 30-Day Returns","🛡 5-Year Warranty"].map(x=>`<span style="font-size:11px;color:var(--gray)">${x}</span>`).join("")}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Expose for button
+  window.addToCart = () => Cart.add(p);
+
+  // Related products
+  const allP = await fetchProducts();
+  const related = allP.filter(x => x.id !== p.id && x.category === p.category).slice(0, 3);
+  if (related.length) {
+    const relSection = document.getElementById("related-section");
+    relSection.style.display = "block";
+    document.getElementById("related-grid").innerHTML = related.map(r => `
+      <a href="product.html?id=${r.id}" class="product-card" style="display:block;background:var(--dark2);border:1px solid rgba(255,255,255,0.04);transition:border-color 0.3s">
+        <div style="aspect-ratio:1;background:radial-gradient(circle at 50% 38%,#191919,#090909);display:flex;align-items:center;justify-content:center">
+          ${watchDisplay(r, 140)}
+        </div>
+        <div style="padding:20px;border-top:1px solid rgba(255,255,255,0.04)">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:6px">${r.brand}</div>
+          <div style="font-family:var(--font-display);font-size:20px">${r.name}</div>
+          <div style="font-family:var(--font-display);font-size:22px;color:var(--gold);margin-top:12px">${fmtPrice(r.price)}</div>
+        </div>
+      </a>`).join("");
+  }
+
+  // Re-init cursor
+  document.querySelectorAll("button, a").forEach(el => {
+    el.addEventListener("mouseenter", () => document.querySelector(".cursor-ring")?.classList.add("hovering"));
+    el.addEventListener("mouseleave", () => document.querySelector(".cursor-ring")?.classList.remove("hovering"));
+  });
+}
+
+loadProduct();
+</script>
+</body>
+</html>
