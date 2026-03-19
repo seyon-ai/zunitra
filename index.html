@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZUNITRA — Home de Haute Zunitrarie</title>
+<meta name="description" content="Discover exceptional Zunitra timepieces — precision-engineered luxury watches for those who demand the finest.">
+<link rel="stylesheet" href="global.css">
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<!-- Page Loader -->
+<div id="page-loader">
+  <div class="loader-logo">ZUNITRA</div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- Navigation -->
+<nav id="nav">
+  <a href="index.html" class="nav-logo">ZUNI<span>TRA</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Collection</a></li>
+    <li><a href="index.html#heritage">Heritage</a></li>
+    <li><a href="index.html#ateliers">Ateliers</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="nav-search-btn" aria-label="Search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </button>
+    <button class="nav-icon-btn" id="nav-account-btn" aria-label="Account">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="nav-icon-btn" onclick="window.location.href='cart.html'" aria-label="Cart" style="position:relative">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="nav-badge" id="cart-badge" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="auth-modal-title">Welcome</h2>
+      <button class="modal-close-btn" onclick="closeAuthModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs" style="display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid rgba(255,255,255,0.08)">
+        <button class="auth-tab active" data-tab="login" onclick="switchAuthTab('login')" style="flex:1;padding:12px;background:none;border:none;color:var(--gold);font-size:10px;letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid var(--gold)">Sign In</button>
+        <button class="auth-tab" data-tab="signup" onclick="switchAuthTab('signup')" style="flex:1;padding:12px;background:none;border:none;color:var(--gray);font-size:10px;letter-spacing:3px;text-transform:uppercase;border-bottom:2px solid transparent;transition:all 0.3s">Create Account</button>
+      </div>
+      <!-- Login Panel -->
+      <div id="panel-login">
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="login-email" placeholder="your@email.com">
+        </div>
+        <div class="form-group" style="margin-bottom:24px">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="login-pass" placeholder="••••••••">
+        </div>
+        <p class="form-error" id="login-error" style="display:none;margin-bottom:12px"></p>
+        <button class="btn btn-gold btn-full btn-lg" id="login-btn" onclick="handleLogin()">Sign In</button>
+        <div class="form-divider" style="margin:20px 0">or</div>
+        <button class="btn btn-outline btn-full" onclick="handleGoogleAuth()">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+        <p style="margin-top:16px;font-size:11px;color:var(--gray);text-align:center">
+          <a href="#" onclick="switchAuthTab('signup')" style="color:var(--gold)">Create an account</a>
+        </p>
+      </div>
+      <!-- Signup Panel -->
+      <div id="panel-signup" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-input" id="signup-fname" placeholder="Jean">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-input" id="signup-lname" placeholder="Harmon">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:16px">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="signup-email" placeholder="your@email.com">
+        </div>
+        <div class="form-group" style="margin-bottom:24px">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="signup-pass" placeholder="Min. 8 characters">
+        </div>
+        <p class="form-error" id="signup-error" style="display:none;margin-bottom:12px"></p>
+        <button class="btn btn-gold btn-full btn-lg" onclick="handleSignup()">Create Account</button>
+        <p style="margin-top:16px;font-size:11px;color:var(--gray);text-align:center">
+          Already a member? <a href="#" onclick="switchAuthTab('login')" style="color:var(--gold)">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO ─────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-particles" id="hero-particles"></div>
+
+  <div class="hero-content">
+    <div class="eyebrow anim-fade-up">Home de Haute Zunitrarie · Est. 1847</div>
+    <h1 class="hero-title anim-fade-up-1">
+      Where<br><em>Time</em><br>Becomes<br>Legend.
+    </h1>
+    <p class="hero-desc anim-fade-up-2">
+      Each timepiece is a testament to centuries of horological mastery — where precision mechanics meet the poetry of design. Discover watches that endure beyond generations.
+    </p>
+    <div class="hero-actions anim-fade-up-3">
+      <a href="shop.html" class="btn btn-gold btn-lg">Explore Collection</a>
+      <a href="#heritage" class="btn btn-outline btn-lg">Our Heritage</a>
+    </div>
+    <div class="hero-stats anim-fade-up-4">
+      <div class="stat"><span class="stat-n">177</span><span class="stat-l">Years of Craft</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-n">12</span><span class="stat-l">Master Ateliers</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-n">98%</span><span class="stat-l">Client Satisfaction</span></div>
+    </div>
+  </div>
+
+  <!-- Animated Watch -->
+  <div class="hero-watch-area">
+    <div class="orbit orbit-1"></div>
+    <div class="orbit orbit-2"></div>
+    <div class="orbit orbit-3"></div>
+    <div class="hero-watch-face" id="hero-watch">
+      <!-- watch rendered by JS -->
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span class="scroll-text">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- FEATURED ─────────────────────────────────────── -->
+<section class="featured-section">
+  <div class="featured-header reveal">
+    <div class="eyebrow">New Arrivals</div>
+    <h2 class="section-title">The Season's Finest</h2>
+    <a href="shop.html" class="btn btn-outline-gold">View All</a>
+  </div>
+  <div class="featured-grid" id="featured-grid">
+    <!-- Skeleton cards -->
+    <div class="feat-skeleton skeleton"></div>
+    <div class="feat-skeleton skeleton"></div>
+    <div class="feat-skeleton skeleton"></div>
+  </div>
+</section>
+
+<!-- HERITAGE ─────────────────────────────────────── -->
+<section id="heritage" class="heritage-section">
+  <div class="heritage-inner">
+    <div class="heritage-text reveal">
+      <div class="eyebrow">Our Heritage</div>
+      <h2 class="section-title">177 Years of<br><em>Uncompromising</em><br>Precision</h2>
+      <p class="heritage-desc">In 1847, Jules Harmon established his first workshop in the Vallée de Joux — a valley of watchmakers where silence was sacred and imperfection unthinkable. Today, twelve generations of craftsmen carry that legacy forward, using techniques unchanged since the Second Empire.</p>
+      <p class="heritage-desc" style="margin-top:16px">Every Zunitra begins as a block of metal and a promise. It ends as an heirloom.</p>
+      <a href="shop.html" class="btn btn-outline-gold" style="margin-top:32px">Discover the Collection</a>
+    </div>
+    <div class="heritage-visual reveal" style="transition-delay:0.2s">
+      <div class="heritage-watch-wrap" id="heritage-watch"></div>
+      <div class="heritage-label">Grande Complication · HG-0001</div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES ───────────────────────────────────── -->
+<section class="categories-section">
+  <div class="categories-header reveal">
+    <div class="eyebrow">Browse by Style</div>
+    <h2 class="section-title">Find Your Timepiece</h2>
+  </div>
+  <div class="cat-grid">
+    <a href="shop.html?cat=dress" class="cat-card reveal" style="transition-delay:0s">
+      <div class="cat-bg" style="background:radial-gradient(circle at 60% 40%,#1A0D0033,#080808),linear-gradient(135deg,#1A0A00,#0A0600)"></div>
+      <div class="cat-watch" id="cat-dress"></div>
+      <div class="cat-info"><span class="cat-name">Dress</span><span class="cat-count">3 Pieces</span></div>
+    </a>
+    <a href="shop.html?cat=sport" class="cat-card reveal" style="transition-delay:0.1s">
+      <div class="cat-bg" style="background:radial-gradient(circle at 60% 40%,#001A2033,#080808),linear-gradient(135deg,#001A20,#000A10)"></div>
+      <div class="cat-watch" id="cat-sport"></div>
+      <div class="cat-info"><span class="cat-name">Sport</span><span class="cat-count">2 Pieces</span></div>
+    </a>
+    <a href="shop.html?cat=complications" class="cat-card reveal" style="transition-delay:0.2s">
+      <div class="cat-bg" style="background:radial-gradient(circle at 60% 40%,#1A0D0033,#080808),linear-gradient(135deg,#0A0A1A,#050510)"></div>
+      <div class="cat-watch" id="cat-comp"></div>
+      <div class="cat-info"><span class="cat-name">Complications</span><span class="cat-count">2 Pieces</span></div>
+    </a>
+    <a href="shop.html?cat=limited" class="cat-card reveal" style="transition-delay:0.3s">
+      <div class="cat-bg" style="background:radial-gradient(circle at 60% 40%,#0A0A0033,#080808),linear-gradient(135deg,#0A0A0A,#050505)"></div>
+      <div class="cat-watch" id="cat-ltd"></div>
+      <div class="cat-info"><span class="cat-name">Limited Edition</span><span class="cat-count">2 Pieces</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ATELIERS ──────────────────────────────────────── -->
+<section id="ateliers" class="ateliers-section">
+  <div class="eyebrow reveal" style="justify-content:center">The Craft</div>
+  <h2 class="section-title reveal" style="text-align:center;margin-top:12px">Inside the Atelier</h2>
+  <div class="craft-grid">
+    <div class="craft-item reveal" style="transition-delay:0s">
+      <div class="craft-icon">⚙</div>
+      <h3 class="craft-title">Movement Assembly</h3>
+      <p class="craft-desc">Each calibre is assembled by a single watchmaker over weeks of meticulous work. No component is rushed. No shortcut taken.</p>
+    </div>
+    <div class="craft-item reveal" style="transition-delay:0.1s">
+      <div class="craft-icon">✦</div>
+      <h3 class="craft-title">Dial Artistry</h3>
+      <p class="craft-desc">Our dials are formed from extraordinary materials — meteorite, onyx, Grand Feu enamel — each requiring specialist artisans trained for decades.</p>
+    </div>
+    <div class="craft-item reveal" style="transition-delay:0.2s">
+      <div class="craft-icon">◇</div>
+      <h3 class="craft-title">Case Finishing</h3>
+      <p class="craft-desc">Alternating between polished and satin surfaces demands absolute precision. A single case can take 80 hours of hand-finishing before leaving the atelier.</p>
+    </div>
+    <div class="craft-item reveal" style="transition-delay:0.3s">
+      <div class="craft-icon">∞</div>
+      <h3 class="craft-title">Quality Control</h3>
+      <p class="craft-desc">Every watch undergoes 300 hours of testing before shipment. We reject anything that fails to exceed our standard — which itself exceeds every official certification.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER ───────────────────────────────────── -->
+<section class="newsletter-section reveal">
+  <div class="newsletter-inner">
+    <div class="eyebrow" style="justify-content:center">Private Correspondence</div>
+    <h2 class="section-title" style="text-align:center;margin-top:12px">Join the Zunitra Circle</h2>
+    <p style="text-align:center;color:var(--gray);font-size:13px;margin:16px auto 32px;max-width:440px;line-height:1.8">Be first to discover new editions, private events, and stories from our ateliers. Strictly curated. Unsubscribe at any time.</p>
+    <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+      <input type="email" class="form-input" placeholder="your@email.com" required style="flex:1;min-width:240px">
+      <button type="submit" class="btn btn-gold">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-main">
+    <div>
+      <div class="footer-brand-name">ZUNITRA</div>
+      <p class="footer-tagline">Since our founding, crafting timepieces of singular distinction. Every Zunitra is a dialogue between artisan and eternity.</p>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Navigate</div>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="shop.html">Collection</a></li>
+        <li><a href="index.html#heritage">Heritage</a></li>
+        <li><a href="index.html#ateliers">Ateliers</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Services</div>
+      <ul>
+        <li><a href="#">Authentication</a></li>
+        <li><a href="#">Service & Repair</a></li>
+        <li><a href="#">Engraving</a></li>
+        <li><a href="#">Insurance</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <div class="footer-col-title">Legal</div>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Sale</a></li>
+        <li><a href="#">Shipping Policy</a></li>
+        <li><a href="#">Returns</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Zunitra Home. All rights reserved.</span>
+    <span>Crafted with precision in Geneva, Switzerland</span>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { initShared, fetchProducts, watchSVG, watchDisplay, showToast, Cart, fmtPrice } from "./utils.js";
+import { auth } from "./firebase-config.js";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+initShared();
+
+// Auth modal helpers (window scope so nav button can call them)
+window.openAuthModal = function(mode) {
+  document.getElementById("auth-modal").classList.add("open");
+  if (mode === "signup") switchAuthTab("signup");
+};
+window.closeAuthModal = function() {
+  document.getElementById("auth-modal").classList.remove("open");
+};
+
+// ── Hero watch clock ──
+const heroWatch = document.getElementById("hero-watch");
+if (heroWatch) {
+  heroWatch.innerHTML = watchSVG({ id:"hero", color:"#0A0600", accentColor:"#C9A84C" }, 280);
+  const heroSVG = heroWatch.querySelector("svg");
+  if (heroSVG) heroSVG.style.filter = "drop-shadow(0 0 40px rgba(201,168,76,0.25))";
+}
+
+// Live clock in hero
+function updateHeroClock() {
+  const now = new Date();
+  const h = now.getHours() % 12, m = now.getMinutes(), s = now.getSeconds();
+  const hDeg = h * 30 + m * 0.5;
+  const mDeg = m * 6;
+  const sDeg = s * 6;
+  const svg = heroWatch?.querySelector("svg");
+  if (!svg) return;
+  const lines = svg.querySelectorAll("line");
+  // lines[ticks(12)] then hands: hour=12, min=13, sec=14
+  if (lines.length >= 15) {
+    const cx = 100, cy = 120;
+    function endpoint(cx, cy, angle, len) {
+      const r = angle * Math.PI / 180;
+      return { x: cx + len * Math.sin(r), y: cy - len * Math.cos(r) };
+    }
+    const hEnd = endpoint(cx, cy, hDeg, 28);
+    lines[12].setAttribute("x2", hEnd.x); lines[12].setAttribute("y2", hEnd.y);
+    const mEnd = endpoint(cx, cy, mDeg, 38);
+    lines[13].setAttribute("x2", mEnd.x); lines[13].setAttribute("y2", mEnd.y);
+    const sEnd = endpoint(cx, cy, sDeg, 44);
+    lines[14].setAttribute("x2", sEnd.x); lines[14].setAttribute("y2", sEnd.y);
+  }
+}
+setInterval(updateHeroClock, 1000);
+updateHeroClock();
+
+// ── Particles ──
+const canvas = document.createElement("canvas");
+canvas.style.cssText = "position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0.4";
+document.getElementById("hero-particles")?.appendChild(canvas);
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+const ctx = canvas.getContext("2d");
+const particles = Array.from({length: 60}, () => ({
+  x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+  r: Math.random() * 1.5 + 0.3,
+  vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+  opacity: Math.random() * 0.6 + 0.1
+}));
+function animParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x < 0) p.x = canvas.width;
+    if (p.x > canvas.width) p.x = 0;
+    if (p.y < 0) p.y = canvas.height;
+    if (p.y > canvas.height) p.y = 0;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(201,168,76,${p.opacity})`;
+    ctx.fill();
+  });
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ── Featured Products ──
+const grid = document.getElementById("featured-grid");
+fetchProducts().then(products => {
+  const featured = products.filter(p => p.badge === "new" || p.rating === 5).slice(0, 3);
+  grid.innerHTML = featured.map(p => `
+    <a href="product.html?id=${p.id}" class="feat-card reveal">
+      <div class="feat-img-wrap">
+        ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge === "limited" ? "Limited" : p.badge === "new" ? "New" : "Sale"}</span>` : ""}
+        ${watchSVG(p, 180)}
+      </div>
+      <div class="feat-info">
+        <div class="feat-brand">${p.brand}</div>
+        <div class="feat-name">${p.name}</div>
+        <div class="feat-ref">Ref. ${p.ref}</div>
+        <div class="feat-footer">
+          <div class="feat-price">${p.originalPrice ? `<span class="orig" style="font-size:13px;color:#666;text-decoration:line-through;display:block">$${p.originalPrice.toLocaleString()}</span>` : ""}${fmtPrice(p.price)}</div>
+          <div class="stars">${"★".repeat(p.rating)}${"☆".repeat(5-p.rating)}</div>
+        </div>
+      </div>
+    </a>`).join("");
+
+  // Scroll reveal for new cards
+  document.querySelectorAll(".reveal").forEach(el => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    obs.observe(el);
+  });
+});
+
+// ── Category watches ──
+const catWatches = [
+  { id:"cat-dress", data: { id:"d1", color:"#1A0A00", accentColor:"#C9A84C" } },
+  { id:"cat-sport", data: { id:"s1", color:"#001A20", accentColor:"#4ABCD4" } },
+  { id:"cat-comp",  data: { id:"c1", color:"#0A0A1A", accentColor:"#B0C4DE" } },
+  { id:"cat-ltd",   data: { id:"l1", color:"#0A0A0A", accentColor:"#C0C0C0" } },
+];
+catWatches.forEach(({id, data}) => {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = watchSVG(data, 120);
+});
+
+// Heritage watch
+const hw = document.getElementById("heritage-watch");
+if (hw) hw.innerHTML = watchSVG({ id:"hh", color:"#0A0A1A", accentColor:"#B0C4DE" }, 260);
+
+// ── Auth handlers ──
+window.openAuthModal = () => {
+  document.getElementById("auth-modal").classList.add("open");
+};
+window.closeAuthModal = () => {
+  document.getElementById("auth-modal").classList.remove("open");
+};
+window.switchAuthTab = (tab) => {
+  document.querySelectorAll(".auth-tab").forEach(t => {
+    const active = t.dataset.tab === tab;
+    t.classList.toggle("active", active);
+    t.style.color = active ? "var(--gold)" : "var(--gray)";
+    t.style.borderBottom = active ? "2px solid var(--gold)" : "2px solid transparent";
+  });
+  document.getElementById("panel-login").style.display = tab === "login" ? "block" : "none";
+  document.getElementById("panel-signup").style.display = tab === "signup" ? "block" : "none";
+};
+
+window.handleLogin = async () => {
+  const email = document.getElementById("login-email").value;
+  const pass = document.getElementById("login-pass").value;
+  const errEl = document.getElementById("login-error");
+  const btn = document.getElementById("login-btn");
+  btn.textContent = "Signing in…";
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.closeAuthModal();
+    showToast("Welcome back to Zunitra");
+  } catch (e) {
+    errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth.*\)/, "");
+    errEl.style.display = "block";
+  }
+  btn.textContent = "Sign In";
+};
+
+window.handleSignup = async () => {
+  const fname = document.getElementById("signup-fname").value;
+  const lname = document.getElementById("signup-lname").value;
+  const email = document.getElementById("signup-email").value;
+  const pass = document.getElementById("signup-pass").value;
+  const errEl = document.getElementById("signup-error");
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: `${fname} ${lname}` });
+    window.closeAuthModal();
+    showToast("Welcome to the Zunitra circle");
+    window.location.href = "account.html";
+  } catch (e) {
+    errEl.textContent = e.message.replace("Firebase: ", "").replace(/\(auth.*\)/, "");
+    errEl.style.display = "block";
+  }
+};
+
+window.handleGoogleAuth = async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    window.closeAuthModal();
+    showToast("Welcome to Zunitra");
+  } catch(e) {
+    showToast("Google sign-in failed", "error");
+  }
+};
+
+window.handleNewsletter = (e) => {
+  e.preventDefault();
+  showToast("You've joined the Zunitra Circle — thank you");
+  e.target.reset();
+};
+
+// Close modal on overlay click
+document.getElementById("auth-modal")?.addEventListener("click", function(e) {
+  if (e.target === this) window.closeAuthModal();
+});
+</script>
+</body>
+</html>
