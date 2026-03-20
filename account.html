@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — ZUNITRA</title>
+<link rel="stylesheet" href="global.css">
+<style>
+.account-page { padding-top: var(--nav-h); min-height: 100vh; background: var(--dark); }
+.account-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - var(--nav-h)); }
+
+.sidebar { background: var(--dark2); border-right: 1px solid rgba(201,168,76,0.08); padding: 40px 24px; display: flex; flex-direction: column; position: sticky; top: var(--nav-h); height: calc(100vh - var(--nav-h)); overflow-y: auto; }
+.acct-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--gold-dark), #080808); border: 2px solid rgba(201,168,76,0.3); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 24px; color: var(--gold); margin-bottom: 14px; }
+.acct-name  { font-family: var(--font-display); font-size: 20px; font-weight: 300; margin-bottom: 4px; }
+.acct-email { font-size: 11px; color: var(--gray); letter-spacing: 1px; margin-bottom: 6px; word-break: break-all; }
+.acct-since { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid rgba(201,168,76,0.12); }
+
+.nav-menu { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.nav-mi { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border-radius: 2px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray-light); background: none; border: none; width: 100%; text-align: left; cursor: pointer; transition: all 0.25s; border-left: 2px solid transparent; }
+.nav-mi:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+.nav-mi.active { color: var(--gold); background: rgba(201,168,76,0.06); border-left-color: var(--gold); }
+.signout-btn { margin-top: auto; padding: 10px 12px; background: none; border: 1px solid rgba(200,50,50,0.2); color: rgba(200,80,80,0.7); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: all 0.25s; text-align: left; }
+.signout-btn:hover { color: var(--red); border-color: rgba(200,50,50,0.5); }
+
+.acct-main { padding: 40px 48px; overflow-y: auto; }
+.section-hd { margin-bottom: 32px; }
+.section-hd h2 { font-family: var(--font-display); font-size: 36px; font-weight: 300; margin-top: 10px; }
+.acct-section { display: none; }
+.acct-section.active { display: block; }
+
+/* Orders */
+.order-card { background: var(--dark2); border: 1px solid rgba(255,255,255,0.06); margin-bottom: 14px; transition: border-color 0.25s; }
+.order-card:hover { border-color: rgba(201,168,76,0.2); }
+.order-hd { padding: 18px 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.order-id-text { font-size: 11px; letter-spacing: 2px; color: var(--gold); }
+.order-date-text { font-size: 11px; color: var(--gray); letter-spacing: 1px; margin-top: 3px; }
+.order-status-badge { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; }
+.status-pending   { background: rgba(201,168,76,0.12); color: var(--gold); }
+.status-shipped   { background: rgba(41,128,185,0.12); color: #5DADE2; }
+.status-delivered { background: rgba(39,174,96,0.12); color: #27AE60; }
+.status-cancelled { background: rgba(192,57,43,0.12); color: var(--red); }
+.order-total-text { font-family: var(--font-display); font-size: 20px; }
+.order-items-wrap { padding: 14px 22px; }
+.order-item-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--gray-light); }
+.order-item-row:last-child { border: none; }
+.order-item-price { color: var(--gold); }
+
+/* Profile form */
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 560px; }
+.profile-section-label { grid-column: 1/-1; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); margin-top: 4px; }
+.profile-section-label:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+
+/* Settings */
+.settings-block { background: var(--dark2); border: 1px solid rgba(255,255,255,0.06); padding: 24px; margin-bottom: 14px; max-width: 480px; }
+.settings-block h3 { font-family: var(--font-display); font-size: 20px; font-weight: 300; margin-bottom: 8px; }
+.settings-block p { font-size: 12px; color: var(--gray); margin-bottom: 16px; line-height: 1.7; }
+
+/* Login wall */
+.login-wall { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - var(--nav-h)); text-align: center; padding: 40px; }
+.login-wall h2 { font-family: var(--font-display); font-size: 40px; font-weight: 300; margin-bottom: 12px; }
+.login-wall p { font-size: 13px; color: var(--gray); margin-bottom: 32px; max-width: 360px; line-height: 1.8; }
+
+/* Auth modal */
+.auth-tab-btn { flex: 1; padding: 12px; background: none; border: none; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.3s; }
+
+@media(max-width:900px){ .account-layout{grid-template-columns:1fr;} .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:20px;} .nav-menu{flex-direction:row;flex-wrap:wrap;} .nav-mi{border-left:none;border-bottom:2px solid transparent;} .nav-mi.active{border-bottom-color:var(--gold);border-left:none;} .acct-main{padding:24px;} }
+@media(max-width:640px){ .profile-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<div id="page-loader"><div class="loader-logo">ZUNITRA</div><div class="loader-bar"></div></div>
+
+<nav id="nav">
+  <a href="index.html" class="nav-logo">ZUNI<span>TRA</span></a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Collection</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn" id="nav-account-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </button>
+    <button class="nav-icon-btn" onclick="location.href='cart.html'" style="position:relative">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="nav-badge" id="cart-badge" style="display:none">0</span>
+    </button>
+  </div>
+</nav>
+
+<div class="account-page" id="account-page">
+
+  <!-- Login wall -->
+  <div class="login-wall" id="login-wall" style="display:none">
+    <span style="font-size:48px;opacity:0.1;display:block;margin-bottom:24px">⌚</span>
+    <h2>Members Only</h2>
+    <p>Sign in to view your orders, manage your profile and access exclusive Zunitra benefits.</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-gold btn-lg" onclick="openModal('login')">Sign In</button>
+      <button class="btn btn-outline btn-lg" onclick="openModal('signup')">Create Account</button>
+    </div>
+  </div>
+
+  <!-- Account layout -->
+  <div class="account-layout" id="account-layout" style="display:none">
+    <aside class="sidebar">
+      <div class="acct-avatar" id="acct-avatar">Z</div>
+      <div class="acct-name" id="acct-name">Loading…</div>
+      <div class="acct-email" id="acct-email"></div>
+      <div class="acct-since" id="acct-since"></div>
+      <nav class="nav-menu">
+        <button class="nav-mi active" data-sec="orders" onclick="showSec('orders',this)">📦 Orders</button>
+        <button class="nav-mi" data-sec="profile" onclick="showSec('profile',this)">👤 Profile</button>
+        <button class="nav-mi" data-sec="settings" onclick="showSec('settings',this)">⚙ Settings</button>
+      </nav>
+      <button class="signout-btn" onclick="doSignOut()">Sign Out</button>
+    </aside>
+
+    <main class="acct-main">
+      <!-- ORDERS -->
+      <div class="acct-section active" id="sec-orders">
+        <div class="section-hd"><div class="eyebrow">Your Account</div><h2>Order History</h2></div>
+        <div id="orders-wrap"><div style="color:var(--gray);font-size:13px;padding:20px 0">Loading your orders…</div></div>
+      </div>
+
+      <!-- PROFILE -->
+      <div class="acct-section" id="sec-profile">
+        <div class="section-hd"><div class="eyebrow">Your Account</div><h2>Profile</h2></div>
+        <div class="profile-grid">
+          <div class="profile-section-label">Personal Info</div>
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="pf-fname" placeholder="Arjun"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="pf-lname" placeholder="Sharma"></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Email (cannot change)</label><input type="email" class="form-input" id="pf-email" disabled style="opacity:0.5"></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Phone</label><input type="tel" class="form-input" id="pf-phone" placeholder="+91 98765 43210"></div>
+          <div class="profile-section-label">Default Address</div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">Street</label><input type="text" class="form-input" id="pf-addr" placeholder="Street / Flat / Building"></div>
+          <div class="form-group"><label class="form-label">City</label><input type="text" class="form-input" id="pf-city" placeholder="Mumbai"></div>
+          <div class="form-group"><label class="form-label">PIN Code</label><input type="text" class="form-input" id="pf-zip" placeholder="400001"></div>
+          <div class="form-group" style="grid-column:1/-1;margin-top:8px"><button class="btn btn-gold" onclick="saveProfile()">Save Changes</button></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="acct-section" id="sec-settings">
+        <div class="section-hd"><div class="eyebrow">Your Account</div><h2>Settings</h2></div>
+        <div class="settings-block">
+          <h3>Change Password</h3>
+          <p>We'll send a password reset link to your registered email address.</p>
+          <button class="btn btn-outline-gold" onclick="sendReset()">Send Reset Email</button>
+        </div>
+        <div class="settings-block">
+          <h3>Email Preferences</h3>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:1px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--gold)"> New Collection Announcements</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:1px;cursor:pointer"><input type="checkbox" checked style="accent-color:var(--gold)"> Order Updates &amp; Shipping</label>
+            <label style="display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:1px;cursor:pointer"><input type="checkbox" style="accent-color:var(--gold)"> Exclusive Offers</label>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="showToastW('Preferences saved')">Save</button>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal-overlay" id="auth-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">Welcome to Zunitra</h2>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:24px">
+        <button class="auth-tab-btn active" id="tab-login" onclick="switchTab('login')" style="color:var(--gold);border-bottom-color:var(--gold)">Sign In</button>
+        <button class="auth-tab-btn" id="tab-signup" onclick="switchTab('signup')" style="color:var(--gray);border-bottom-color:transparent">Create Account</button>
+      </div>
+      <div id="panel-login">
+        <div class="form-group" style="margin-bottom:14px"><label class="form-label">Email</label><input type="email" class="form-input" id="l-email" placeholder="your@email.com"></div>
+        <div class="form-group" style="margin-bottom:20px"><label class="form-label">Password</label><input type="password" class="form-input" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <div id="l-err" style="color:var(--red);font-size:11px;margin-bottom:12px;display:none"></div>
+        <button class="btn btn-gold btn-full btn-lg" onclick="doLogin()">Sign In</button>
+        <div style="display:flex;align-items:center;gap:12px;margin:16px 0;font-size:11px;color:var(--gray)"><div style="flex:1;height:1px;background:rgba(255,255,255,0.08)"></div>or<div style="flex:1;height:1px;background:rgba(255,255,255,0.08)"></div></div>
+        <button class="btn btn-outline btn-full" onclick="doGoogle()">
+          <svg width="15" height="15" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continue with Google
+        </button>
+      </div>
+      <div id="panel-signup" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" id="s-fname" placeholder="Arjun"></div>
+          <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" id="s-lname" placeholder="Sharma"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:14px"><label class="form-label">Email</label><input type="email" class="form-input" id="s-email" placeholder="your@email.com"></div>
+        <div class="form-group" style="margin-bottom:20px"><label class="form-label">Password</label><input type="password" class="form-input" id="s-pass" placeholder="Min. 8 characters"></div>
+        <div id="s-err" style="color:var(--red);font-size:11px;margin-bottom:12px;display:none"></div>
+        <button class="btn btn-gold btn-full btn-lg" onclick="doSignup()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script type="module">
+import { initShared, getUserOrders, showToast, fmtPriceRaw } from "./utils.js";
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+initShared();
+window.showToastW = showToast;
+const USD_TO_INR = 83.5;
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    document.getElementById("login-wall").style.display = "none";
+    document.getElementById("account-layout").style.display = "grid";
+    const name = user.displayName || user.email.split("@")[0];
+    document.getElementById("acct-avatar").textContent = name.substring(0,2).toUpperCase();
+    document.getElementById("acct-name").textContent = name;
+    document.getElementById("acct-email").textContent = user.email;
+    document.getElementById("acct-since").textContent = "Member since " + new Date(user.metadata.creationTime).getFullYear();
+    const names = name.split(" ");
+    document.getElementById("pf-fname").value = names[0] || "";
+    document.getElementById("pf-lname").value = names.slice(1).join(" ") || "";
+    document.getElementById("pf-email").value = user.email;
+    // Load saved profile
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.phone) document.getElementById("pf-phone").value = d.phone;
+        if (d.address) document.getElementById("pf-addr").value = d.address;
+        if (d.city)    document.getElementById("pf-city").value = d.city;
+        if (d.zip)     document.getElementById("pf-zip").value = d.zip;
+      }
+    } catch(e) {}
+    loadOrders(user.uid);
+  } else {
+    document.getElementById("login-wall").style.display = "flex";
+    document.getElementById("account-layout").style.display = "none";
+  }
+});
+
+async function loadOrders(uid) {
+  const wrap = document.getElementById("orders-wrap");
+  try {
+    const orders = await getUserOrders(uid);
+    if (!orders.length) {
+      wrap.innerHTML = `<div style="padding:60px;text-align:center"><div style="font-size:40px;opacity:0.1;margin-bottom:16px">📦</div><p style="color:var(--gray);font-size:13px;line-height:2">No orders yet.<br><a href="shop.html" style="color:var(--gold)">Explore the collection →</a></p></div>`;
+      return;
+    }
+    wrap.innerHTML = orders.map(o => {
+      const date = o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().toLocaleDateString("en-IN",{year:"numeric",month:"short",day:"numeric"}) : "Recent";
+      const statusCls = "status-" + (o.status || "pending");
+      const inr = o.total ? Math.round(o.total * USD_TO_INR).toLocaleString("en-IN") : "—";
+      const payLabel = o.paymentMethod === "cod" ? " · COD" : "";
+      return `<div class="order-card">
+        <div class="order-hd">
+          <div>
+            <div class="order-id-text">Order #${o.id.substring(0,8).toUpperCase()}</div>
+            <div class="order-date-text">${date}${payLabel}</div>
+          </div>
+          <span class="order-status-badge ${statusCls}">${(o.status||"pending").charAt(0).toUpperCase()+(o.status||"pending").slice(1)}</span>
+          <div class="order-total-text">${fmtPriceRaw(o.total||0)} <small style="color:#777;font-size:12px">/ ₹${inr}</small></div>
+        </div>
+        <div class="order-items-wrap">
+          ${(o.items||[]).map(i=>`<div class="order-item-row"><span>${i.name} ×${i.qty||1}</span><span class="order-item-price">${fmtPriceRaw((i.price||0)*(i.qty||1))}</span></div>`).join("")}
+        </div>
+      </div>`;
+    }).join("");
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:var(--gray);padding:20px">Could not load orders. Please try again.</div>`;
+  }
+}
+
+window.showSec = (sec, btn) => {
+  document.querySelectorAll(".acct-section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-mi").forEach(b => b.classList.remove("active"));
+  document.getElementById("sec-"+sec).classList.add("active");
+  btn && btn.classList.add("active");
+};
+
+window.saveProfile = async () => {
+  const user = auth.currentUser;
+  if (!user) return;
+  try {
+    const fname = document.getElementById("pf-fname").value;
+    const lname = document.getElementById("pf-lname").value;
+    await updateProfile(user, { displayName: fname + " " + lname });
+    await setDoc(doc(db,"users",user.uid), {
+      displayName: fname+" "+lname,
+      phone:   document.getElementById("pf-phone").value,
+      address: document.getElementById("pf-addr").value,
+      city:    document.getElementById("pf-city").value,
+      zip:     document.getElementById("pf-zip").value,
+    }, {merge:true});
+    showToast("Profile saved!");
+  } catch(e) { showToast("Error: "+e.message,"error"); }
+};
+
+window.doSignOut = async () => { await signOut(auth); showToast("Signed out","info"); };
+window.sendReset = async () => {
+  try { await sendPasswordResetEmail(auth, auth.currentUser.email); showToast("Reset email sent!"); }
+  catch(e) { showToast("Error: "+e.message,"error"); }
+};
+
+// ── Auth modal ────────────────────────────────────────────────
+window.openModal = (mode) => {
+  document.getElementById("auth-modal").classList.add("open");
+  switchTab(mode||"login");
+};
+window.closeModal = () => { document.getElementById("auth-modal").classList.remove("open"); };
+window.openAuthModal = window.openModal;
+
+window.switchTab = (tab) => {
+  const isLogin = tab === "login";
+  document.getElementById("panel-login").style.display  = isLogin ? "block" : "none";
+  document.getElementById("panel-signup").style.display = isLogin ? "none"  : "block";
+  document.getElementById("tab-login").style.cssText  = isLogin ? "color:var(--gold);border-bottom-color:var(--gold)"  : "color:var(--gray);border-bottom-color:transparent";
+  document.getElementById("tab-signup").style.cssText = isLogin ? "color:var(--gray);border-bottom-color:transparent" : "color:var(--gold);border-bottom-color:var(--gold)";
+};
+
+window.doLogin = async () => {
+  const email = document.getElementById("l-email").value;
+  const pass  = document.getElementById("l-pass").value;
+  const err   = document.getElementById("l-err");
+  err.style.display = "none";
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.closeModal();
+    showToast("Welcome back!");
+  } catch(e) { err.textContent = e.message.replace("Firebase: ","").replace(/\(auth.*\)/,""); err.style.display="block"; }
+};
+
+window.doSignup = async () => {
+  const fname = document.getElementById("s-fname").value;
+  const lname = document.getElementById("s-lname").value;
+  const email = document.getElementById("s-email").value;
+  const pass  = document.getElementById("s-pass").value;
+  const err   = document.getElementById("s-err");
+  err.style.display = "none";
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: fname+" "+lname });
+    window.closeModal();
+    showToast("Welcome to Zunitra!");
+  } catch(e) { err.textContent = e.message.replace("Firebase: ","").replace(/\(auth.*\)/,""); err.style.display="block"; }
+};
+
+window.doGoogle = async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+    window.closeModal();
+    showToast("Signed in with Google!");
+  } catch(e) { showToast("Google sign-in failed","error"); }
+};
+
+document.getElementById("auth-modal").addEventListener("click", function(e){ if(e.target===this) window.closeModal(); });
+</script>
+</body>
+</html>
