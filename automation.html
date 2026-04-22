@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Automation — ZUNITRA</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#C9A84C;--gold-light:#E8C96A;--gold-muted:rgba(201,168,76,0.1);
+  --black:#080808;--dark:#0F0F0F;--dark2:#141414;--dark3:#1A1A1A;
+  --gray:#666;--gray-light:#999;--white:#F5F0E8;
+  --green:#27AE60;--red:#C0392B;--blue:#2980B9;
+  --font-d:'Cormorant Garamond',serif;--font-b:'Montserrat',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-b);background:var(--dark);color:var(--white);min-height:100vh}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font-family:var(--font-b)}
+button{cursor:pointer}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ── Login ── */
+#ls{position:fixed;inset:0;background:var(--black);z-index:9999;display:flex;align-items:center;justify-content:center}
+.lb{background:var(--dark2);border:1px solid rgba(201,168,76,.25);padding:44px;width:360px}
+.ll{font-family:var(--font-d);font-size:26px;letter-spacing:8px;color:var(--gold);text-align:center;margin-bottom:4px}
+.lsub{text-align:center;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:32px}
+.fi{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:11px 14px;font-size:13px;outline:none;transition:border-color .3s;margin-bottom:14px}
+.fi:focus{border-color:var(--gold)}
+.fi::placeholder{color:var(--gray)}
+.lhint{text-align:center;margin-top:14px;font-size:11px;color:var(--gray)}
+.lhint strong{color:var(--gold)}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:var(--font-b);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;border:none;padding:11px 22px;cursor:pointer;transition:all .3s;white-space:nowrap}
+.btn-gold{background:var(--gold);color:var(--black)}.btn-gold:hover{background:var(--gold-light)}
+.btn-gold:disabled{opacity:.5;pointer-events:none}
+.btn-outline{background:none;border:1px solid rgba(201,168,76,.4);color:var(--gold)}.btn-outline:hover{background:var(--gold-muted)}
+.btn-ghost{background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray-light)}.btn-ghost:hover{color:var(--white)}
+.btn-green{background:var(--green);color:var(--white)}.btn-green:hover{background:#219a52}
+.btn-red{background:rgba(192,57,43,.15);border:1px solid rgba(192,57,43,.3);color:var(--red)}
+.btn-sm{padding:8px 16px;font-size:9px}
+.btn-full{width:100%;justify-content:center}
+
+/* ── Layout ── */
+#app{display:none}
+.topbar{background:rgba(8,8,8,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(201,168,76,.1);padding:0 32px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.topbar-logo{font-family:var(--font-d);font-size:20px;letter-spacing:6px;color:var(--gold)}
+.main{padding:28px;max-width:1300px;margin:0 auto}
+
+/* ── Stats ── */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat{background:var(--dark2);border:1px solid rgba(255,255,255,.06);padding:20px;position:relative;overflow:hidden}
+.stat::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat.gold::before{background:var(--gold)}.stat.green::before{background:var(--green)}.stat.blue::before{background:var(--blue)}
+.stat-val{font-family:var(--font-d);font-size:34px;font-weight:300;line-height:1}
+.stat-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:6px}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px}
+.tab{padding:12px 20px;background:none;border:none;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);border-bottom:2px solid transparent;cursor:pointer;transition:all .3s}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+
+/* ── Cards ── */
+.card{background:var(--dark2);border:1px solid rgba(255,255,255,.06);padding:22px;margin-bottom:16px}
+.card-title{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:18px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.fl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--gray)}
+.fl span{color:var(--gold)}
+.fid{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--white);padding:10px 13px;font-size:12px;outline:none;transition:border-color .3s;width:100%}
+.fid:focus{border-color:var(--gold)}
+.fid::placeholder{color:var(--gray)}
+select.fid option{background:var(--dark3)}
+textarea.fid{resize:vertical;line-height:1.7}
+
+/* ── Log ── */
+.log{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.06);padding:14px;height:240px;overflow-y:auto;font-size:11px;line-height:2;font-family:'Courier New',monospace}
+.log .s{color:var(--green)}.log .e{color:var(--red)}.log .i{color:var(--gold)}.log .d{color:var(--gray)}
+
+/* ── Progress ── */
+.prog-wrap{background:rgba(255,255,255,.05);height:3px;margin:10px 0;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#9A7A2E,var(--gold),var(--gold-light));transition:width .4s;width:0}
+
+/* ── Product grid ── */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pc{background:var(--dark3);border:1px solid rgba(255,255,255,.06);overflow:hidden;transition:border-color .3s;position:relative}
+.pc:hover{border-color:rgba(201,168,76,.3)}
+.pc-img{height:150px;background:radial-gradient(circle at 50% 40%,#181818,#0a0a0a);display:flex;align-items:center;justify-content:center;font-size:36px;opacity:.15;overflow:hidden}
+.pc-img img{width:100%;height:100%;object-fit:cover;opacity:1}
+.pc-badge{position:absolute;top:10px;left:10px;background:var(--gold);color:var(--black);font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px}
+.pc-body{padding:14px}
+.pc-brand{font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:4px;text-transform:uppercase}
+.pc-name{font-family:var(--font-d);font-size:18px;margin-bottom:4px;line-height:1.2}
+.pc-price{font-family:var(--font-d);font-size:20px;color:var(--gold)}
+.pc-price small{font-family:var(--font-b);font-size:10px;color:var(--gray);display:block;margin-top:2px}
+.pc-desc{font-size:11px;color:var(--gray);line-height:1.6;margin:8px 0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pc-actions{display:flex;gap:8px;margin-top:10px}
+
+/* ── Notif status ── */
+.ns{display:flex;align-items:center;gap:8px;font-size:11px;padding:10px 14px;margin-top:10px}
+.ns.ok{background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.2);color:var(--green)}
+.ns.warn{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold)}
+
+/* ── Toast ── */
+#toasts{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--dark3);border:1px solid rgba(201,168,76,.3);padding:12px 18px;display:flex;align-items:center;gap:10px;min-width:260px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:tin .3s ease}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.ts{color:var(--green)}.te{color:var(--red)}.ti{color:var(--gold)}
+
+/* ── Modal ── */
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}
+.mbg.open{opacity:1;visibility:visible}
+.mbox{background:var(--dark2);border:1px solid rgba(201,168,76,.2);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;transform:translateY(16px);transition:transform .3s}
+.mbg.open .mbox{transform:translateY(0)}
+.mhd{padding:22px 26px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--dark2);z-index:1}
+.mt{font-family:var(--font-d);font-size:24px;font-weight:300}
+.mc{background:none;border:1px solid rgba(255,255,255,.1);color:var(--gray);width:28px;height:28px;font-size:14px;transition:all .3s}
+.mc:hover{border-color:var(--gold);color:var(--gold)}
+.mbody{padding:22px 26px 26px}
+.mft{padding:14px 26px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:10px;justify-content:flex-end}
+
+/* ── Info box ── */
+.info-box{padding:14px 16px;font-size:11px;line-height:2;margin-bottom:16px}
+.info-gold{background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);color:var(--gray-light)}
+.info-gold strong{color:var(--gold)}
+.info-blue{background:rgba(41,128,185,.06);border:1px solid rgba(41,128,185,.2);color:var(--gray-light)}
+.info-blue strong{color:#5DADE2}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+@media(max-width:800px){
+  .stats,.two{grid-template-columns:1fr}
+  .main{padding:16px}
+  #nav{padding:0 16px}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="ls">
+  <div class="lb">
+    <div class="ll">ZUNITRA</div>
+    <div class="lsub">AI Automation — Powered by Groq</div>
+    <input type="password" class="fi" id="pw" placeholder="Admin password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn btn-gold btn-full" onclick="login()">Access Panel</button>
+    <div class="lhint">Password: <strong>zunitra2024</strong></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">ZUNITRA AI</div>
+    <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gray)">Automation Panel</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="display:flex;align-items:center;gap:8px;font-size:10px;color:var(--green)">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite"></div>
+        Groq AI Ready
+      </div>
+      <a href="admin.html" class="btn btn-ghost btn-sm">Admin Panel</a>
+      <button class="btn btn-ghost btn-sm" onclick="sessionStorage.clear();location.reload()">Logout</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat gold"><div class="stat-val" id="s-prod">—</div><div class="stat-lbl">Products Live</div></div>
+      <div class="stat green"><div class="stat-val" id="s-ai">—</div><div class="stat-lbl">AI Generated Today</div></div>
+      <div class="stat blue"><div class="stat-val" id="s-ord">—</div><div class="stat-lbl">Total Orders</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" id="t1" onclick="goTab(1)">🤖 AI Generator</button>
+      <button class="tab" id="t2" onclick="goTab(2)">🔔 Notifications</button>
+      <button class="tab" id="t3" onclick="goTab(3)">📦 AI Products</button>
+    </div>
+
+    <!-- ── TAB 1: AI GENERATOR ── -->
+    <div id="p1">
+      <div class="two">
+
+        <!-- Settings card -->
+        <div class="card">
+          <div class="card-title">⚡ Groq AI Settings</div>
+
+          <div class="info-gold" style="margin-bottom:18px;padding:12px 14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);font-size:11px;line-height:1.8;color:var(--gray-light)">
+            <strong style="color:var(--gold)">Groq AI</strong> — Ultra-fast AI, free tier, runs llama-3.3-70b model.<br>
+            Products are generated in seconds and auto-published to your store.
+          </div>
+
+          <div class="two">
+            <div class="fg">
+              <label class="fl">Watch Category</label>
+              <select class="fid" id="cat">
+                <option value="trending luxury watches India 2025">Trending Luxury India</option>
+                <option value="premium dress watches Indian market">Premium Dress Watches</option>
+                <option value="sports diving watches professional">Sport &amp; Diving</option>
+                <option value="limited edition collector watches">Limited Edition</option>
+                <option value="automatic mechanical Swiss watches">Swiss Automatic</option>
+                <option value="luxury smartwatch hybrid India">Luxury Hybrid</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Products to Generate</label>
+              <select class="fid" id="cnt">
+                <option value="3">3 products</option>
+                <option value="5" selected>5 products</option>
+                <option value="8">8 products</option>
+                <option value="10">10 products</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Your Profit Margin</label>
+              <select class="fid" id="margin">
+                <option value="25">25% margin</option>
+                <option value="35" selected>35% margin</option>
+                <option value="50">50% margin</option>
+                <option value="75">75% margin</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Price Range (USD)</label>
+              <select class="fid" id="prng">
+                <option value="200,2000">$200 – $2,000</option>
+                <option value="500,5000" selected>$500 – $5,000</option>
+                <option value="2000,15000">$2,000 – $15,000</option>
+                <option value="5000,50000">$5,000 – $50,000</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fg">
+            <label class="fl">Custom Instructions to AI</label>
+            <textarea class="fid" id="instr" rows="4" placeholder="e.g. Focus on Indian brands like Titan alongside Swiss luxury. Always include warranty info...">Focus on luxury and premium watches popular in the Indian market. Include a mix of iconic Swiss brands and premium options. Provide detailed specs: movement type, water resistance, crystal type, case material, warranty. Make descriptions aspirational and elegant. All prices should be competitive for Indian luxury buyers.</textarea>
+          </div>
+
+          <button class="btn btn-gold btn-full" id="run-btn" onclick="runAI()" style="padding:16px;margin-top:6px;font-size:11px">
+            ⚡ Generate &amp; Publish to Store
+          </button>
+        </div>
+
+        <!-- Log card -->
+        <div class="card">
+          <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+            Live Activity Log
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('logbox').innerHTML=''">Clear</button>
+          </div>
+          <div style="font-size:11px;color:var(--gold);min-height:18px;margin-bottom:6px" id="status-txt"></div>
+          <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
+          <div class="log" id="logbox"></div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--gray)">
+            <span id="log-sum">Ready. Click Generate to start.</span>
+            <span id="log-time"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── TAB 2: NOTIFICATIONS ── -->
+    <div id="p2" style="display:none">
+      <div class="two">
+
+        <!-- WhatsApp -->
+        <div class="card">
+          <div class="card-title">💬 WhatsApp Order Alerts</div>
+          <div class="info-box info-gold">
+            <strong>Setup (free, 2 minutes):</strong><br>
+            1. Save this number: <strong style="color:var(--white)">+34 644 52 74 97</strong><br>
+            2. Send this WhatsApp to it:<br>
+            <strong style="color:var(--white)">"I allow callmebot to send me messages"</strong><br>
+            3. You get your API key back in seconds<br>
+            4. Paste it below and save
+          </div>
+          <div class="fg"><label class="fl">Your WhatsApp Number <span>(with +91)</span></label><input type="text" class="fid" id="wa-num" placeholder="+919876543210"></div>
+          <div class="fg"><label class="fl">CallMeBot API Key</label><input type="text" class="fid" id="wa-key" placeholder="e.g. 1234567"></div>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn btn-green btn-sm" onclick="testWA()">Send Test</button>
+            <button class="btn btn-gold btn-sm" onclick="saveCfg()">Save Config</button>
+          </div>
+          <div id="wa-st" class="ns" style="display:none"></div>
+        </div>
+
+        <!-- SMS -->
+        <div class="card">
+          <div class="card-title">📱 SMS Order Alerts (Fast2SMS)</div>
+          <div class="info-box info-blue">
+            <strong>Setup:</strong><br>
+            1. Sign up at <a href="https://fast2sms.com" target="_blank" style="color:var(--gold)">fast2sms.com</a><br>
+            2. Go to <strong>Dev API</strong> → copy your API key<br>
+            3. Add ₹50 credit (~500 order SMS alerts)<br>
+            4. Paste key below and save
+          </div>
+          <div class="fg"><label class="fl">Your Mobile <span>(10 digits, no +91)</span></label><input type="text" class="fid" id="sms-num" placeholder="9876543210"></div>
+          <div class="fg"><label class="fl">Fast2SMS API Key</label><input type="text" class="fid" id="sms-key" placeholder="Paste your Fast2SMS key"></div>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button class="btn btn-green btn-sm" onclick="testSMS()">Send Test</button>
+            <button class="btn btn-gold btn-sm" onclick="saveCfg()">Save Config</button>
+          </div>
+          <div id="sms-st" class="ns" style="display:none"></div>
+        </div>
+
+        <!-- Template -->
+        <div class="card" style="grid-column:1/-1">
+          <div class="card-title">📝 Order Alert Message Template</div>
+          <p style="font-size:11px;color:var(--gray);margin-bottom:12px">
+            Available variables:
+            <span style="color:var(--gold)">{orderid} {name} {phone} {email} {items} {total} {payment} {address}</span>
+          </p>
+          <textarea class="fid" id="tmpl" rows="7" style="line-height:1.9">🛍️ NEW ZUNITRA ORDER!
+Order ID: #{orderid}
+Customer: {name}
+Phone: {phone}
+Email: {email}
+Items: {items}
+Total: {total}
+Payment: {payment}
+Address: {address}
+→ Open admin panel to manage this order.</textarea>
+          <button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="saveCfg()">Save Template</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── TAB 3: AI PRODUCTS ── -->
+    <div id="p3" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <div style="font-family:var(--font-d);font-size:28px;font-weight:300">AI Generated Products</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:4px" id="pgrid-count">Loading...</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-outline btn-sm" onclick="loadProds()">🔄 Refresh</button>
+          <button class="btn btn-red btn-sm" id="del-all-btn" style="display:none" onclick="deleteAll()">🗑️ Delete All AI Products</button>
+        </div>
+      </div>
+      <div class="pgrid" id="pgrid">
+        <div style="color:var(--gray);padding:60px;text-align:center;grid-column:1/-1">
+          <div style="font-size:48px;opacity:.08;margin-bottom:16px">🤖</div>
+          Run the AI Generator to create products automatically.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Product Modal -->
+<div class="mbg" id="modal">
+  <div class="mbox">
+    <div class="mhd">
+      <div class="mt" id="modal-title">Product</div>
+      <button class="mc" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mbody" id="modal-body"></div>
+    <div class="mft">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>
+      <button class="btn btn-red btn-sm" id="modal-del">🗑️ Delete</button>
+    </div>
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script type="module">
+import { db } from "./firebase-config.js";
+import {
+  collection, doc, getDocs, addDoc, deleteDoc,
+  query, where, serverTimestamp, getDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── CONFIG ────────────────────────────────────────────────────
+const ADMIN_PASS  = "zunitra2024";
+const GROQ_KEY    = "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";
+const GROQ_URL    = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL  = "llama-3.3-70b-versatile";
+const USD_TO_INR  = 83.5;
+const CFG_KEY     = "zunitra_auto_cfg_v2";
+
+// ── LOGIN ─────────────────────────────────────────────────────
+window.login = () => {
+  if (document.getElementById("pw").value === ADMIN_PASS) {
+    sessionStorage.setItem("za2", "1");
+    document.getElementById("ls").style.display  = "none";
+    document.getElementById("app").style.display = "block";
+    init();
+  } else {
+    const el = document.getElementById("pw");
+    el.style.borderColor = "var(--red)";
+    el.value = "";
+    el.placeholder = "Wrong password!";
+    setTimeout(() => { el.style.borderColor = ""; el.placeholder = "Admin password"; }, 2000);
+  }
+};
+if (sessionStorage.getItem("za2")) {
+  document.getElementById("ls").style.display  = "none";
+  document.getElementById("app").style.display = "block";
+  init();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+function init() {
+  loadCfg();
+  loadStats();
+  setupOrderListener();
+  log("✓ System ready. Groq AI loaded. Click Generate to create products.", "i");
+}
+
+// ── CONFIG SAVE/LOAD ──────────────────────────────────────────
+function loadCfg() {
+  const c = JSON.parse(localStorage.getItem(CFG_KEY) || "{}");
+  if (c.waNum)  document.getElementById("wa-num").value  = c.waNum;
+  if (c.waKey)  document.getElementById("wa-key").value  = c.waKey;
+  if (c.smsNum) document.getElementById("sms-num").value = c.smsNum;
+  if (c.smsKey) document.getElementById("sms-key").value = c.smsKey;
+  if (c.tmpl)   document.getElementById("tmpl").value    = c.tmpl;
+}
+window.saveCfg = () => {
+  localStorage.setItem(CFG_KEY, JSON.stringify({
+    waNum:  document.getElementById("wa-num").value.trim(),
+    waKey:  document.getElementById("wa-key").value.trim(),
+    smsNum: document.getElementById("sms-num").value.trim(),
+    smsKey: document.getElementById("sms-key").value.trim(),
+    tmpl:   document.getElementById("tmpl").value,
+  }));
+  toast("Configuration saved!", "s");
+};
+function getCfg() { return JSON.parse(localStorage.getItem(CFG_KEY) || "{}"); }
+
+// ── STATS ─────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const ps = await getDocs(collection(db, "products"));
+    document.getElementById("s-prod").textContent = ps.size;
+    const os = await getDocs(collection(db, "orders"));
+    document.getElementById("s-ord").textContent  = os.size;
+    const today = new Date(); today.setHours(0,0,0,0);
+    let n = 0;
+    ps.forEach(d => {
+      const x = d.data();
+      if (x.aiGenerated) {
+        const t = x.createdAt?.toDate ? x.createdAt.toDate() : new Date(0);
+        if (t >= today) n++;
+      }
+    });
+    document.getElementById("s-ai").textContent = n;
+  } catch(e) { console.warn("Stats:", e); }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+window.goTab = (n) => {
+  [1,2,3].forEach(i => {
+    document.getElementById("t" + i).classList.toggle("active", i === n);
+    document.getElementById("p" + i).style.display = i === n ? "block" : "none";
+  });
+  if (n === 3) loadProds();
+};
+
+// ── LOG ───────────────────────────────────────────────────────
+function log(msg, type) {
+  type = type || "d";
+  const box = document.getElementById("logbox");
+  const el  = document.createElement("div");
+  el.className = type;
+  const t = new Date().toLocaleTimeString("en-IN", {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+  el.textContent = "[" + t + "] " + msg;
+  box.appendChild(el);
+  box.scrollTop = box.scrollHeight;
+}
+function setProgress(pct, status) {
+  document.getElementById("prog").style.width       = pct + "%";
+  document.getElementById("status-txt").textContent = status || "";
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg, type) {
+  type = type || "i";
+  const icons = { s:"✓", e:"✕", i:"ℹ" };
+  const c = document.getElementById("toasts");
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.innerHTML = `<span class="t${type}">${icons[type] || "ℹ"}</span><span style="font-size:12px;flex:1">${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    el.style.transition = "opacity .3s";
+    setTimeout(() => el.remove(), 300);
+  }, 4000);
+}
+
+// ── CALL GROQ AI ──────────────────────────────────────────────
+async function callGroq(systemPrompt, userPrompt) {
+  const res = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": "Bearer " + GROQ_KEY,
+    },
+    body: JSON.stringify({
+      model:       GROQ_MODEL,
+      temperature: 0.7,
+      max_tokens:  4096,
+      messages: [
+        { role: "system",  content: systemPrompt },
+        { role: "user",    content: userPrompt   },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || "Groq API error " + res.status);
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content;
+  if (!text) throw new Error("Empty response from Groq");
+  return text;
+}
+
+// ── MAIN AI GENERATOR ─────────────────────────────────────────
+window.runAI = async () => {
+  const btn      = document.getElementById("run-btn");
+  const category = document.getElementById("cat").value;
+  const count    = parseInt(document.getElementById("cnt").value);
+  const margin   = parseInt(document.getElementById("margin").value);
+  const prParts  = document.getElementById("prng").value.split(",");
+  const minP     = parseInt(prParts[0]);
+  const maxP     = parseInt(prParts[1]);
+  const instr    = document.getElementById("instr").value.trim();
+
+  btn.disabled = true;
+  btn.textContent = "⚡ AI is generating...";
+  document.getElementById("logbox").innerHTML = "";
+
+  setProgress(5, "Sending request to Groq AI...");
+  log("Starting: " + count + " products for '" + category + "'", "i");
+  log("Model: " + GROQ_MODEL + " | Margin: " + margin + "% | Price: $" + minP + "–$" + maxP, "d");
+
+  const systemPrompt = `You are an expert luxury watch product manager for ZUNITRA, a premium Indian e-commerce watch store.
+Your job is to generate realistic luxury watch product listings in valid JSON format.
+You MUST respond with ONLY valid JSON — no explanations, no markdown, no backticks, no extra text.
+Every product must be unique, realistic, and suitable for the Indian luxury market.`;
+
+  const userPrompt = `Generate exactly ${count} luxury watch product listings for the category: "${category}"
+
+Owner Instructions: ${instr}
+
+Pricing:
+- Cost price: between $${minP} and $${maxP} (vary them)
+- Selling price = cost × ${(1 + margin / 100).toFixed(2)} then round to nearest $25
+- INR price = selling price × 83.5
+
+Return ONLY this JSON structure, nothing else:
+{
+  "products": [
+    {
+      "name": "Watch model full name",
+      "brand": "Brand name",
+      "ref": "ZN-${1000 + Math.floor(Math.random() * 8999)}",
+      "category": "dress",
+      "costPrice": 1200,
+      "price": 1625,
+      "priceInr": 135688,
+      "badge": "new",
+      "rating": 5,
+      "reviews": 24,
+      "stock": 8,
+      "color": "#0A0600",
+      "accentColor": "#C9A84C",
+      "desc": "Short compelling 1-sentence description under 120 chars.",
+      "longDesc": "2-3 sentences about craftsmanship, heritage, and what makes this watch special.",
+      "specs": {
+        "Case Material": "42mm Stainless Steel",
+        "Movement": "Swiss Automatic",
+        "Power Reserve": "42 Hours",
+        "Water Resistance": "100m / 10 ATM",
+        "Crystal": "Sapphire Anti-reflective",
+        "Strap": "Alligator Leather",
+        "Dial": "Sunburst Blue",
+        "Warranty": "2 Years International"
+      }
+    }
+  ]
+}
+
+Rules:
+- category must be one of: dress, sport, complications, limited
+- badge must be one of: new, sale, limited, or empty string ""
+- color: dark hex like #0A0600 or #001A20 or #080808
+- accentColor: #C9A84C (gold) or #C0C0C0 (silver) or #4ABCD4 (blue)
+- Make each watch completely different and realistic
+- ONLY return JSON, absolutely nothing else`;
+
+  try {
+    const raw = await callGroq(systemPrompt, userPrompt);
+    log("Got response (" + raw.length + " chars)", "d");
+    setProgress(55, "Parsing response...");
+
+    // Clean and parse JSON
+    let jsonStr = raw.trim()
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/\s*```$/i, "")
+      .trim();
+
+    // Find the JSON boundaries
+    const si = jsonStr.indexOf("{");
+    const ei = jsonStr.lastIndexOf("}");
+    if (si === -1 || ei === -1) {
+      throw new Error("No JSON found in response. Got: " + raw.substring(0, 200));
+    }
+    jsonStr = jsonStr.substring(si, ei + 1);
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch(pe) {
+      // Try to fix trailing commas
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, "$1");
+      parsed = JSON.parse(jsonStr);
+    }
+
+    const products = parsed.products || [];
+    if (!products.length) throw new Error("AI returned 0 products");
+
+    log("✓ Parsed " + products.length + " products", "s");
+    setProgress(65, "Saving to Firebase...");
+
+    let saved = 0;
+    for (let i = 0; i < products.length; i++) {
+      const p = products[i];
+      try {
+        const sellPrice = Math.round(
+          ((p.price) || ((p.costPrice || minP) * (1 + margin / 100)))
+          / 25) * 25;
+
+        await addDoc(collection(db, "products"), {
+          name:        String(p.name        || "Luxury Watch"),
+          brand:       String(p.brand       || "Zunitra"),
+          ref:         String(p.ref         || "ZN-" + (1000 + Math.floor(Math.random() * 9000))),
+          category:    ["dress","sport","complications","limited"].includes(p.category)
+                         ? p.category : "dress",
+          price:       sellPrice,
+          costPrice:   Number(p.costPrice)  || 0,
+          priceInr:    Math.round(sellPrice * USD_TO_INR),
+          originalPrice: null,
+          badge:       ["new","sale","limited",""].includes(p.badge) ? (p.badge || "") : "",
+          rating:      Math.min(5, Math.max(1, Number(p.rating) || 5)),
+          reviews:     Number(p.reviews)    || 0,
+          stock:       Number(p.stock)      || 10,
+          color:       String(p.color       || "#0A0600"),
+          accentColor: String(p.accentColor || "#C9A84C"),
+          desc:        String(p.desc        || ""),
+          longDesc:    String(p.longDesc    || p.desc || ""),
+          specs:       (p.specs && typeof p.specs === "object") ? p.specs : {},
+          imageUrl:    "",
+          images:      [],
+          aiGenerated: true,
+          aiModel:     GROQ_MODEL,
+          aiCategory:  category,
+          createdAt:   serverTimestamp(),
+        });
+
+        saved++;
+        log(
+          "✓ " + (p.name || "Watch") +
+          " — $" + sellPrice +
+          " / ₹" + Math.round(sellPrice * USD_TO_INR).toLocaleString("en-IN"),
+          "s"
+        );
+        setProgress(
+          65 + Math.round((saved / products.length) * 32),
+          "Saved " + saved + "/" + products.length + "..."
+        );
+
+      } catch(saveErr) {
+        log("✗ Failed to save: " + (p.name || "product") + " — " + saveErr.message, "e");
+      }
+    }
+
+    setProgress(100, "✅ Complete!");
+    log("", "d");
+    log("✨ Done! " + saved + "/" + products.length + " products published to your store.", "s");
+    document.getElementById("log-sum").textContent  = saved + " products added";
+    document.getElementById("log-time").textContent = new Date().toLocaleTimeString();
+    toast(saved + " products published to your store!", "s");
+    await loadStats();
+    setTimeout(() => setProgress(0, ""), 4000);
+
+  } catch(err) {
+    log("✗ Error: " + err.message, "e");
+    toast("Failed: " + err.message, "e");
+    setProgress(0, "");
+    console.error("Groq error:", err);
+  }
+
+  btn.disabled = false;
+  btn.textContent = "⚡ Generate & Publish to Store";
+};
+
+// ── LOAD AI PRODUCTS ──────────────────────────────────────────
+window.loadProds = async () => {
+  const grid    = document.getElementById("pgrid");
+  const countEl = document.getElementById("pgrid-count");
+  grid.innerHTML = `<div style="color:var(--gray);padding:40px;text-align:center;grid-column:1/-1">Loading...</div>`;
+
+  try {
+    const snap  = await getDocs(query(collection(db, "products"), where("aiGenerated","==",true)));
+    const prods = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    prods.sort((a, b) => {
+      const ta = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+      const tb = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+      return tb - ta;
+    });
+
+    countEl.textContent = prods.length + " AI product" + (prods.length !== 1 ? "s" : "") + " in store";
+    document.getElementById("del-all-btn").style.display = prods.length ? "inline-flex" : "none";
+
+    if (!prods.length) {
+      grid.innerHTML = `<div style="color:var(--gray);padding:60px;text-align:center;grid-column:1/-1">
+        <div style="font-size:48px;opacity:.08;margin-bottom:16px">🤖</div>
+        No AI products yet. Run the generator!
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = prods.map(p => {
+      const inr = Math.round((p.price || 0) * USD_TO_INR).toLocaleString("en-IN");
+      return `<div class="pc">
+        ${p.badge ? `<div class="pc-badge">${p.badge}</div>` : ""}
+        <div class="pc-img">
+          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="">` : "⌚"}
+        </div>
+        <div class="pc-body">
+          <div class="pc-brand">${p.brand || "Zunitra"}</div>
+          <div class="pc-name">${p.name}</div>
+          <div class="pc-price">$${(p.price || 0).toLocaleString()}
+            <small>₹${inr}</small>
+          </div>
+          <div class="pc-desc">${p.desc || ""}</div>
+          <div class="pc-actions">
+            <button class="btn btn-ghost btn-sm" style="flex:1" onclick="previewProd('${p.id}')">View</button>
+            <button class="btn btn-red btn-sm" onclick="deleteProd('${p.id}','${(p.name || "").replace(/'/g, "")}')">✕</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--red);padding:40px;grid-column:1/-1">Error: ${e.message}</div>`;
+  }
+};
+
+// ── PRODUCT PREVIEW ───────────────────────────────────────────
+window.previewProd = async (id) => {
+  try {
+    const snap = await getDoc(doc(db, "products", id));
+    if (!snap.exists()) return;
+    const p   = snap.data();
+    const inr = Math.round((p.price || 0) * USD_TO_INR).toLocaleString("en-IN");
+
+    document.getElementById("modal-title").textContent = p.name;
+    document.getElementById("modal-body").innerHTML = `
+      <div style="margin-bottom:16px">
+        <div style="font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:4px">${p.brand} · ${p.ref}</div>
+        <div style="font-family:var(--font-d);font-size:26px;font-weight:300;margin-bottom:6px">${p.name}</div>
+        <div style="font-family:var(--font-d);font-size:28px;color:var(--gold)">
+          $${(p.price || 0).toLocaleString()}
+          <small style="font-family:var(--font-b);font-size:12px;color:var(--gray);display:block">₹${inr} · Cost: $${p.costPrice || 0}</small>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--gray-light);line-height:1.9;margin-bottom:18px">${p.longDesc || p.desc || ""}</div>
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Specifications</div>
+      <div style="border:1px solid rgba(255,255,255,.06)">
+        ${Object.entries(p.specs || {}).map(([k, v], i) =>
+          `<div style="display:flex;justify-content:space-between;padding:8px 14px;${i % 2 ? "background:rgba(255,255,255,.02)" : ""};font-size:12px">
+            <span style="color:var(--gray)">${k}</span><span>${v}</span>
+           </div>`
+        ).join("")}
+      </div>
+      <div style="margin-top:12px;padding:10px 14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);font-size:11px;color:var(--gold)">
+        🤖 Generated by Groq AI (${GROQ_MODEL}) · Category: ${p.aiCategory || p.category}
+      </div>`;
+
+    document.getElementById("modal-del").onclick = () => {
+      deleteProd(id, p.name);
+      closeModal();
+    };
+    document.getElementById("modal").classList.add("open");
+  } catch(e) { toast("Error: " + e.message, "e"); }
+};
+
+window.closeModal = () => document.getElementById("modal").classList.remove("open");
+document.getElementById("modal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── DELETE ────────────────────────────────────────────────────
+window.deleteProd = async (id, name) => {
+  if (!confirm('Delete "' + name + '" from your store?')) return;
+  try {
+    await deleteDoc(doc(db, "products", id));
+    toast('"' + name + '" deleted', "s");
+    loadProds();
+    loadStats();
+  } catch(e) { toast("Delete failed: " + e.message, "e"); }
+};
+
+window.deleteAll = async () => {
+  if (!confirm("Delete ALL AI-generated products? This cannot be undone.")) return;
+  const snap = await getDocs(query(collection(db, "products"), where("aiGenerated", "==", true)));
+  for (const d of snap.docs) await deleteDoc(d.ref);
+  toast("All AI products deleted", "s");
+  loadProds();
+  loadStats();
+};
+
+// ── ORDER LISTENER → NOTIFICATIONS ───────────────────────────
+function setupOrderListener() {
+  try {
+    const startTime = Date.now();
+    onSnapshot(collection(db, "orders"), (snap) => {
+      snap.docChanges().forEach(change => {
+        if (change.type === "added") {
+          const order  = { id: change.doc.id, ...change.doc.data() };
+          const created = order.createdAt?.toDate ? order.createdAt.toDate().getTime() : 0;
+          // Only notify for orders placed AFTER this page loaded
+          if (created > startTime - 10000) {
+            sendNotifs(order);
+          }
+        }
+      });
+    });
+    log("✓ Order listener active — you'll be notified of new orders", "i");
+  } catch(e) { console.warn("Order listener error:", e); }
+}
+
+async function sendNotifs(order) {
+  const cfg   = getCfg();
+  const tmpl  = cfg.tmpl || document.getElementById("tmpl").value;
+  const items = (order.items || []).map(i => (i.name || "") + " ×" + (i.qty || 1)).join(", ");
+  const total = "$" + (order.total || 0).toLocaleString("en-US") +
+                " / ₹" + Math.round((order.total || 0) * USD_TO_INR).toLocaleString("en-IN");
+  const addr  = [
+    order.shipping?.address,
+    order.shipping?.city,
+    order.shipping?.country
+  ].filter(Boolean).join(", ");
+
+  const msg = tmpl
+    .replace("{orderid}",  (order.id || "").substring(0, 8).toUpperCase())
+    .replace("{name}",     order.shipping?.name  || order.email || "—")
+    .replace("{phone}",    order.shipping?.phone || "—")
+    .replace("{email}",    order.email           || "—")
+    .replace("{items}",    items                 || "—")
+    .replace("{total}",    total)
+    .replace("{payment}",  order.paymentMethod   || "—")
+    .replace("{address}",  addr                  || "—");
+
+  // WhatsApp via CallMeBot
+  if (cfg.waNum && cfg.waKey) {
+    try {
+      await fetch(
+        "https://api.callmebot.com/whatsapp.php?phone=" + cfg.waNum +
+        "&text=" + encodeURIComponent(msg) +
+        "&apikey=" + cfg.waKey,
+        { mode: "no-cors" }
+      );
+      log("✓ WhatsApp order alert sent to " + cfg.waNum, "s");
+    } catch(e) { log("✗ WhatsApp failed: " + e.message, "e"); }
+  }
+
+  // SMS via Fast2SMS
+  if (cfg.smsNum && cfg.smsKey) {
+    try {
+      await fetch(
+        "https://www.fast2sms.com/dev/bulkV2?authorization=" + cfg.smsKey +
+        "&route=q&message=" + encodeURIComponent(msg.substring(0, 160)) +
+        "&flash=0&numbers=" + cfg.smsNum,
+        { mode: "no-cors" }
+      );
+      log("✓ SMS order alert sent to " + cfg.smsNum, "s");
+    } catch(e) { log("✗ SMS failed: " + e.message, "e"); }
+  }
+}
+
+// ── TEST NOTIFICATIONS ────────────────────────────────────────
+window.testWA = async () => {
+  const num = document.getElementById("wa-num").value.trim();
+  const key = document.getElementById("wa-key").value.trim();
+  if (!num || !key) { toast("Enter WhatsApp number and API key first", "e"); return; }
+  toast("Sending test WhatsApp...", "i");
+  try {
+    await fetch(
+      "https://api.callmebot.com/whatsapp.php?phone=" + num +
+      "&text=" + encodeURIComponent("✅ ZUNITRA Test: WhatsApp order alerts are working! You'll receive order notifications here.") +
+      "&apikey=" + key,
+      { mode: "no-cors" }
+    );
+    const el = document.getElementById("wa-st");
+    el.style.display = "flex";
+    el.className = "ns ok";
+    el.textContent = "✓ Test sent! Check your WhatsApp now.";
+    toast("Test WhatsApp sent!", "s");
+  } catch(e) { toast("Error: " + e.message, "e"); }
+};
+
+window.testSMS = async () => {
+  const num = document.getElementById("sms-num").value.trim();
+  const key = document.getElementById("sms-key").value.trim();
+  if (!num || !key) { toast("Enter phone number and Fast2SMS key first", "e"); return; }
+  toast("Sending test SMS...", "i");
+  try {
+    await fetch(
+      "https://www.fast2sms.com/dev/bulkV2?authorization=" + key +
+      "&route=q&message=" + encodeURIComponent("ZUNITRA: Order SMS alerts are working! You will receive order notifications here.") +
+      "&flash=0&numbers=" + num,
+      { mode: "no-cors" }
+    );
+    const el = document.getElementById("sms-st");
+    el.style.display = "flex";
+    el.className = "ns ok";
+    el.textContent = "✓ Test sent! Check your phone.";
+    toast("Test SMS sent!", "s");
+  } catch(e) { toast("Error: " + e.message, "e"); }
+};
+</script>
+<script src="ai-chat.js"></script>
+</body>
+</html>
