@@ -248,6 +248,8 @@ async function loadProduct() {
   const p = await fetchProduct(id);
   if (!p) { window.location.href = "shop.html"; return; }
 
+  window.__currentProduct = p;
+
   document.title = `${p.name} — ZUNITRA`;
   document.getElementById("breadcrumb-name").textContent = p.name;
 
