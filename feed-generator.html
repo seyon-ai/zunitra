@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Feed — ZUNITRA</title>
+<style>
+body{font-family:'Montserrat',sans-serif;background:#0F0F0F;color:#F5F0E8;padding:32px;max-width:900px;margin:0 auto}
+h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:#C9A84C;margin-bottom:8px}
+p{color:#666;font-size:12px;margin-bottom:24px;line-height:1.8}
+.btn{display:inline-flex;align-items:center;gap:8px;background:#C9A84C;color:#080808;border:none;padding:12px 24px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;margin-right:12px;margin-bottom:12px;transition:all .2s}
+.btn:hover{background:#E8C96A}
+.btn-out{background:none;border:1px solid rgba(201,168,76,.4);color:#C9A84C}
+.btn-out:hover{background:rgba(201,168,76,.1)}
+#status{padding:12px 16px;background:#141414;border:1px solid rgba(255,255,255,.08);font-size:12px;color:#999;margin-bottom:16px;line-height:1.9;min-height:48px}
+#status.ok{border-color:rgba(39,174,96,.3);color:#27AE60}
+#status.err{border-color:rgba(192,57,43,.3);color:#C0392B}
+pre{background:#0A0A0A;border:1px solid rgba(255,255,255,.06);padding:20px;font-size:11px;overflow-x:auto;max-height:400px;overflow-y:auto;color:#999;line-height:1.7}
+</style>
+</head>
+<body>
+
+<h1>Google Merchant Center Feed</h1>
+<p>
+  This page generates a live XML product feed from your Zunitra store for Google Merchant Center.<br>
+  Submit this URL to Google: <strong style="color:#C9A84C">https://zunitra-luxury-tawny.vercel.app/feed-generator.html</strong><br>
+  Or download the XML file and upload it manually.
+</p>
+
+<button class="btn" onclick="generateFeed()">⚡ Generate Feed Now</button>
+<button class="btn btn-out" onclick="downloadFeed()">⬇ Download feed.xml</button>
+<button class="btn btn-out" onclick="copyFeed()">📋 Copy XML</button>
+
+<div id="status">Click "Generate Feed Now" to create your Google Shopping XML feed.</div>
+<pre id="feed-preview" style="display:none"></pre>
+
+<script type="module">
+import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const config = {
+  apiKey:"AIzaSyDlqviz3CSecuxvRe_IYOKFNFFFLx7_KYs",
+  authDomain:"zunitra.firebaseapp.com",
+  projectId:"zunitra",
+  storageBucket:"zunitra.firebasestorage.app",
+  messagingSenderId:"28187912461",
+  appId:"1:28187912461:web:3ff878061a9d866a5ce844"
+};
+const app = getApps().length ? getApp() : initializeApp(config);
+const db  = getFirestore(app);
+
+const SITE = "https://zunitra-luxury-tawny.vercel.app";
+const USD_TO_INR = 83.5;
+
+let generatedXML = "";
+
+function escapeXML(str) {
+  return String(str || "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&apos;");
+}
+
+function categoryToGoogle(cat) {
+  const map = {
+    dress:          "Apparel & Accessories > Jewelry > Watches",
+    sport:          "Apparel & Accessories > Jewelry > Watches",
+    complications:  "Apparel & Accessories > Jewelry > Watches",
+    limited:        "Apparel & Accessories > Jewelry > Watches",
+  };
+  return map[cat] || "Apparel & Accessories > Jewelry > Watches";
+}
+
+window.generateFeed = async () => {
+  const status  = document.getElementById("status");
+  const preview = document.getElementById("feed-preview");
+  status.className = "";
+  status.textContent = "Loading products from Firebase...";
+
+  try {
+    const snap = await getDocs(collection(db, "products"));
+    const prods = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                          .filter(p => p.name && p.price && (p.stock || 0) > 0);
+
+    if (!prods.length) throw new Error("No products found in your store.");
+
+    status.textContent = "Generating XML for " + prods.length + " products...";
+
+    const now = new Date().toISOString();
+    let xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
+  <channel>
+    <title>ZUNITRA — Fine Timepieces</title>
+    <link>${SITE}</link>
+    <description>Luxury watches from ZUNITRA. Est. 1847 Geneva. Premium timepieces for the discerning collector.</description>
+    <language>en</language>
+    <lastBuildDate>${now}</lastBuildDate>\n`;
+
+    prods.forEach(p => {
+      const price     = Number(p.price) || 0;
+      const inrPrice  = Math.round(price * USD_TO_INR);
+      const imgUrl    = p.imageUrl || "";
+      const productUrl= SITE + "/product.html?id=" + p.id;
+      const brand     = escapeXML(p.brand || "Zunitra");
+      const name      = escapeXML(p.name);
+      const desc      = escapeXML(p.longDesc || p.desc || p.name);
+      const condition = "new";
+      const avail     = (p.stock || 0) > 0 ? "in_stock" : "out_of_stock";
+      const gtin      = ""; // no GTIN for luxury watches unless you have one
+      const specs     = p.specs || {};
+      const material  = escapeXML(specs["Case Material"] || "Stainless Steel");
+      const movement  = escapeXML(specs["Movement"] || "");
+      const wr        = escapeXML(specs["Water Resistance"] || "");
+
+      // Google category
+      const googleCat = categoryToGoogle(p.category);
+
+      // Build title: Brand + Model + key spec
+      const title = escapeXML(
+        brand + " " + (p.name || "") +
+        (movement ? " " + (p.specs?.["Movement"]||"") : "") +
+        " — Luxury Watch"
+      ).substring(0, 150);
+
+      xml += `
+    <item>
+      <g:id>${escapeXML(p.id)}</g:id>
+      <g:title>${title}</g:title>
+      <g:description>${desc.substring(0, 5000)}</g:description>
+      <g:link>${productUrl}</g:link>
+      ${imgUrl ? `<g:image_link>${escapeXML(imgUrl)}</g:image_link>` : ""}
+      <g:price>${price.toFixed(2)} USD</g:price>
+      <g:availability>${avail}</g:availability>
+      <g:condition>${condition}</g:condition>
+      <g:brand>${brand}</g:brand>
+      <g:google_product_category>${googleCat}</g:google_product_category>
+      <g:product_type>${escapeXML(p.category || "dress")} watches</g:product_type>
+      <g:identifier_exists>false</g:identifier_exists>
+      <g:material>${material}</g:material>
+      ${p.ref ? `<g:mpn>${escapeXML(p.ref)}</g:mpn>` : ""}
+      ${p.badge === "sale" && p.originalPrice ? `<g:sale_price>${price.toFixed(2)} USD</g:sale_price>` : ""}
+      <g:shipping>
+        <g:country>IN</g:country>
+        <g:service>Standard Shipping</g:service>
+        <g:price>0 USD</g:price>
+      </g:shipping>
+      <g:custom_label_0>${escapeXML(p.category || "dress")}</g:custom_label_0>
+      <g:custom_label_1>${price >= 5000 ? "luxury" : price >= 1000 ? "premium" : "affordable"}</g:custom_label_1>
+      ${movement ? `<g:custom_label_2>${escapeXML(movement)}</g:custom_label_2>` : ""}
+    </item>`;
+    });
+
+    xml += `\n  </channel>\n</rss>`;
+
+    generatedXML = xml;
+
+    status.className = "ok";
+    status.textContent = "✓ Feed generated successfully! " + prods.length + " products included.";
+    preview.style.display = "block";
+    preview.textContent = xml;
+
+  } catch(e) {
+    status.className = "err";
+    status.textContent = "Error: " + e.message;
+  }
+};
+
+window.downloadFeed = () => {
+  if (!generatedXML) { window.generateFeed().then(() => { if(generatedXML) window.downloadFeed(); }); return; }
+  const blob = new Blob([generatedXML], { type:"application/xml" });
+  const a    = document.createElement("a");
+  a.href     = URL.createObjectURL(blob);
+  a.download = "zunitra-feed.xml";
+  a.click();
+};
+
+window.copyFeed = () => {
+  if (!generatedXML) { alert("Generate the feed first!"); return; }
+  navigator.clipboard.writeText(generatedXML).then(() => {
+    document.getElementById("status").textContent = "✓ XML copied to clipboard!";
+  });
+};
+</script>
+</body>
+</html>
