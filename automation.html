@@ -1051,5 +1051,6 @@ async function sendNotifs(order){
 window.testWA=async()=>{const num=document.getElementById("wa-num").value.trim();const key=document.getElementById("wa-key").value.trim();if(!num||!key){toast("Enter number and key","e");return;}toast("Sending...","i");try{await fetch("https://api.callmebot.com/whatsapp.php?phone="+num+"&text="+encodeURIComponent("✅ ZUNITRA: WhatsApp alerts working!")+"&apikey="+key,{mode:"no-cors"});const el=document.getElementById("wa-st");el.style.display="flex";el.className="ns ok";el.textContent="✓ Test sent!";toast("Sent!","s");}catch(e){toast(e.message,"e");}};
 window.testSMS=async()=>{const num=document.getElementById("sms-num").value.trim();const key=document.getElementById("sms-key").value.trim();if(!num||!key){toast("Enter number and key","e");return;}toast("Sending...","i");try{await fetch("https://www.fast2sms.com/dev/bulkV2?authorization="+key+"&route=q&message="+encodeURIComponent("ZUNITRA: SMS alerts working!")+"&flash=0&numbers="+num,{mode:"no-cors"});const el=document.getElementById("sms-st");el.style.display="flex";el.className="ns ok";el.textContent="✓ Test sent!";toast("Sent!","s");}catch(e){toast(e.message,"e");}};
 </script>
+  <script src="site-schema.js"></script>
 </body>
 </html>
